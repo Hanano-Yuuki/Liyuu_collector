@@ -4,10 +4,11 @@ It also can be used for other UP's albums.
 # Dependences
 1. selectnium
 2. tqdm
-3. numpy
-4. opencv-python
-5. pytorch
-6. facenet-pytorch  
+3. wget
+4. numpy
+5. opencv-python
+6. pytorch
+7. facenet-pytorch  
 # Use
 config your path to chromedriver in main.py
 python3 main.py  
