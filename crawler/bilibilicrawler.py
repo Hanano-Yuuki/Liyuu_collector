@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver import ActionChains
 from tqdm import tqdm
 import time
+import wget
 import os
 
 
@@ -61,13 +62,10 @@ def GetScreenShot(driver,filename):
     pngfile.close()
 
 
-def crawler(url)->list:
-    url = 'https://space.bilibili.com/4549624/album'
-
-    path = '/snap/chromium/1864/usr/lib/chromium-browser/chromedriver'
+def crawler(url,driverpath)->list:
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
-    driver = webdriver.Chrome(chrome_options=chrome_options,executable_path=path)
+    driver = webdriver.Chrome(chrome_options=chrome_options,executable_path=driverpath)
 
     driver.get(url)
     time.sleep(1)
@@ -85,6 +83,7 @@ def crawler(url)->list:
         # GetScreenShot(driver,'page-'+str(i+2)+'.png')
     pngs = [item for sub in pngs for item in sub]
     pngs = list(set(pngs))
-    # for png in pngs:
-    #     os.system('wget '+png[2:])
+    for png in pngs:
+        # os.system('wget '+png[2:])
+        wget.download(png[2:],out='./data/')
     return pngs
