@@ -10,13 +10,13 @@ It also can be used for other UP's albums.
 6. pytorch
 7. facenet-pytorch  
 # Use
-config your path to chromedriver in main.py
-python3 main.py  
+config your path to chromedriver in main.py  
+```python3 main.py```  
 
 ### Part 1
 Crawler - webdriver
 ### Part 2
-Face recognition - FaceNet(MTCNN)
+Face detection - FaceNet(MTCNN)
 
 # Reference
 1. [MTCNN](https://arxiv.org/abs/1604.02878v1)
