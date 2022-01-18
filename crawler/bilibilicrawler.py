@@ -1,14 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.common.by import By
 from selenium.webdriver import ActionChains
-from tqdm import tqdm
 import time
 import wget
 import os
 
 
-def GetAlbums(driver)->list:
+def GetAlbums(driver,datatable=[]):
     source = driver.page_source
     urls=[]
     while(True):
@@ -28,12 +28,11 @@ def GetAlbums(driver)->list:
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
     pngbed = webdriver.Chrome(chrome_options=chrome_options,executable_path=path)
-    tq=tqdm(total=len(urls))
-    tq.display()
-    for items in urls:
+    for i,items in enumerate(urls):
         # print(items)
         pngbed.get('https:'+items)
-        time.sleep(1)
+        # time.sleep(1)
+        WebDriverWait(pngbed,5).until(expected_conditions.presence_of_element_located((By.CLASS_NAME,'main-content')))
         src=pngbed.page_source
         while True:
             beg=src.find('background-image: url(&')
@@ -41,10 +40,14 @@ def GetAlbums(driver)->list:
             src=src[beg:]
             beg=src.find('url(&quot;')+len('url(&quot;')
             end=src.find('@')
+            target_check = src[beg:end]
+            if target_check[2:] in datatable:
+                print('\nHit Database Record!')
+                return (True,target)
             target.append(src[beg:end])
             src=src[end:]
-        tq.update()
-    return target
+        print('\t%d/%d' % (i+1,len(urls)),end='\r')
+    return (False,target)
 
 
 def GetTotualPages(driver)->int:
@@ -62,28 +65,34 @@ def GetScreenShot(driver,filename):
     pngfile.close()
 
 
-def crawler(url,driverpath)->list:
+def crawler(url,driverpath,datatable)->list:
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(chrome_options=chrome_options,executable_path=driverpath)
 
     driver.get(url)
-    time.sleep(1)
+    # time.sleep(1)
+    WebDriverWait(driver,5).until(expected_conditions.presence_of_element_located((By.CLASS_NAME,'album-card__picture')))
 
     # GetScreenShot(driver,'page-1.png')
 
     tot=GetTotualPages(driver)
 
     pngs=[]
-    for i in range(tot-1):
-        pngs.append(GetAlbums(driver))
+    for i in range(tot):
+        print('page %d/%d      ' % (i+1,tot),end='\n')
+        flag,ans = GetAlbums(driver,datatable)
+        pngs.append(ans)
+        if flag: break
+        if i==tot-1: break
         page = driver.find_element_by_class_name('be-pager-next')
         page.click()
-        time.sleep(3)
+        # time.sleep(3)
+        WebDriverWait(driver,5).until(expected_conditions.presence_of_element_located((By.CLASS_NAME,'album-card__picture')))
         # GetScreenShot(driver,'page-'+str(i+2)+'.png')
-    pngs = [item for sub in pngs for item in sub]
+    pngs = [item[2:] for sub in pngs for item in sub]
     pngs = list(set(pngs))
-    for png in pngs:
+    # for png in pngs:
         # os.system('wget '+png[2:])
-        wget.download(png[2:],out='./data/')
+        # wget.download(png[2:],out='./data/')
     return pngs
