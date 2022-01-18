@@ -1,6 +1,6 @@
 # Introduction
 This is a project which collects Liyuu's photographs on [Bilibili](www.bilibili.com).  
-It also can be used for other UP's albums.
+Also, it can be used for other UP's albums.
 # Dependences
 1. selectnium
 2. tqdm
